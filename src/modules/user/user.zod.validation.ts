@@ -2,7 +2,7 @@ import z from "zod";
 
 const createPatientZodSchema = z.object({
   password: z.string(),
-  patient: {
+  patient: z.object({
     name: z.string({
       error: "Name is required",
     }),
@@ -12,7 +12,7 @@ const createPatientZodSchema = z.object({
     }),
     address: z.string().optional(),
     gender: z.enum(["MALE", "FEMALE"]),
-  },
+  }),
 });
 
 export const userZodValidation = {
