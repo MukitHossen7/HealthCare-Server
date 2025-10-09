@@ -12,6 +12,7 @@ const createPatientZodSchema = z.object({
     }),
     address: z.string().optional(),
     gender: z.enum(["MALE", "FEMALE"]),
+    profilePhoto: z.string().optional(),
   }),
 });
 

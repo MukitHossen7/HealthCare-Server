@@ -5,5 +5,6 @@ export interface ICreatePatientInput {
     name: string;
     contactNumber: string;
     gender: "MALE" | "FEMALE";
+    profilePhoto?: string;
   };
 }

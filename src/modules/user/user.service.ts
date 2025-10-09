@@ -10,34 +10,35 @@ const createPatient = async (
 ) => {
   if (file) {
     const upload = await fileUploader.uploadToCloudinary(file);
+    payload.patient.profilePhoto = upload?.secure_url;
   }
-  // const hashPassword = await bcrypt.hash(
-  //   payload.password,
-  //   Number(config.BCRYPTSALTROUND)
-  // );
+  const hashPassword = await bcrypt.hash(
+    payload.password,
+    Number(config.BCRYPTSALTROUND)
+  );
 
-  // const createData = await prisma.$transaction(async (tnx) => {
-  //   await tnx.user.create({
-  //     data: {
-  //       email: payload.patient.email,
-  //       password: hashPassword,
-  //     },
-  //   });
+  const createData = await prisma.$transaction(async (tnx) => {
+    await tnx.user.create({
+      data: {
+        email: payload.patient.email,
+        password: hashPassword,
+      },
+    });
 
-  //   const patientData = await tnx.patient.create({
-  //     data: {
-  //       name: payload.patient.name,
-  //       email: payload.patient.email,
-  //       contactNumber: payload.patient.contactNumber,
-  //       gender: payload.patient.gender,
-  //     },
-  //   });
+    const patientData = await tnx.patient.create({
+      data: {
+        name: payload.patient.name,
+        email: payload.patient.email,
+        contactNumber: payload.patient.contactNumber,
+        gender: payload.patient.gender,
+        profilePhoto: payload.patient.profilePhoto,
+      },
+    });
 
-  //   return patientData;
-  // });
+    return patientData;
+  });
 
-  // return createData;
-  return null;
+  return createData;
 };
 
 export const userServices = {
