@@ -13,4 +13,6 @@ userRoute.post(
   userController.createPatient
 );
 
+//create doctor home work
+// create admin home work
 export default userRoute;

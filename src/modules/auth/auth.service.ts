@@ -3,6 +3,7 @@ import { prisma } from "../../utils/prisma";
 import { IAuth } from "./auth.interface";
 import AppError from "../../errorHelpers/AppError";
 import bcrypt from "bcryptjs";
+import { createUserTokens } from "../../utils/userToken";
 
 const createLogin = async (payload: IAuth) => {
   const user = await prisma.user.findUnique({
@@ -32,7 +33,19 @@ const createLogin = async (payload: IAuth) => {
   if (!isCorrectPassword) {
     throw new AppError(401, "Incorrect password");
   }
-  return user;
+
+  const tokenPayload = {
+    email: user.email,
+    role: user.role,
+    id: user.id,
+  };
+
+  const userTokens = createUserTokens(tokenPayload);
+  return {
+    accessToken: userTokens.accessToken,
+    refreshToken: userTokens.refreshToken,
+    needPasswordChange: user.needPasswordChange,
+  };
 };
 
 export const authServices = {
