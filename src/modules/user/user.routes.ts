@@ -6,6 +6,8 @@ import { userZodValidation } from "./user.zod.validation";
 
 const userRoute = express.Router();
 
+userRoute.get("/", userController.getAllUsers);
+
 userRoute.post(
   "/create-patient",
   fileUploader.upload.single("file"),

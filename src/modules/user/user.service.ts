@@ -8,6 +8,37 @@ import {
 } from "./user.interface";
 import bcrypt from "bcryptjs";
 
+const getAllUsers = async ({
+  limit,
+  page,
+  search,
+}: {
+  limit: number;
+  page: number;
+  search?: string;
+}) => {
+  const skip = (page - 1) * limit;
+  const users = await prisma.user.findMany({
+    skip: skip,
+    take: limit,
+    where: {
+      email: {
+        contains: search,
+        mode: "insensitive",
+      },
+    },
+  });
+  const totalData = await prisma.user.count();
+  return {
+    meta: {
+      page: page,
+      limit: limit,
+      total: totalData,
+    },
+    users,
+  };
+};
+
 const createPatient = async (
   payload: ICreatePatientInput,
   file?: Express.Multer.File
@@ -132,4 +163,5 @@ export const userServices = {
   createPatient,
   createDoctor,
   createAdmin,
+  getAllUsers,
 };
