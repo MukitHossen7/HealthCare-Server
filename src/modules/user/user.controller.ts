@@ -2,8 +2,11 @@ import { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
 import { userServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
+import { pick } from "../../utils/pick";
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  console.log(options);
   const limit = Number(req.query.limit) || 10;
   const page = Number(req.query.page) || 1;
   const search = req.query.search as string | undefined;
