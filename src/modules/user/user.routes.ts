@@ -3,10 +3,12 @@ import { userController } from "./user.controller";
 import { fileUploader } from "../../utils/fileUploader";
 import { zodValidateRequest } from "../../middlewares/zodValidateRequest";
 import { userZodValidation } from "./user.zod.validation";
+import { checkAuth } from "../../middlewares/checkAuth";
+import { UserRole } from "@prisma/client";
 
 const userRoute = express.Router();
 
-userRoute.get("/", userController.getAllUsers);
+userRoute.get("/", checkAuth(UserRole.ADMIN), userController.getAllUsers);
 
 userRoute.post(
   "/create-patient",
