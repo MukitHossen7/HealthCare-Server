@@ -5,25 +5,18 @@ import sendResponse from "../../utils/sendResponse";
 import { pick } from "../../utils/pick";
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, ["search", "role", "status"]);
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-  console.log(options);
-  const limit = Number(req.query.limit) || 10;
-  const page = Number(req.query.page) || 1;
-  const search = req.query.search as string | undefined;
-  const sortBy = (req.query.sortBy || "createdAt") as string;
-  const sortOrder = (req.query.sortOrder || "desc") as string;
-  const role = req.query.role;
-  const status = req.query.status;
 
-  const result = await userServices.getAllUsers({
-    limit,
-    page,
-    search,
-    sortBy,
-    sortOrder,
-    role,
-    status,
-  });
+  // const limit = Number(req.query.limit) || 10;
+  // const page = Number(req.query.page) || 1;
+  // const search = req.query.search as string | undefined;
+  // const sortBy = (req.query.sortBy || "createdAt") as string;
+  // const sortOrder = (req.query.sortOrder || "desc") as string;
+  // const role = req.query.role;
+  // const status = req.query.status;
+
+  const result = await userServices.getAllUsers(filters, options);
   sendResponse(res, {
     statusCode: 200,
     success: true,

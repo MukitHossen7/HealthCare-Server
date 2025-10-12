@@ -1,5 +1,6 @@
 import config from "../../config";
 import { fileUploader } from "../../utils/fileUploader";
+import { calculatePagination } from "../../utils/pagenationHelpers";
 import { prisma } from "../../utils/prisma";
 import {
   ICreateAdminInput,
@@ -8,24 +9,10 @@ import {
 } from "./user.interface";
 import bcrypt from "bcryptjs";
 
-const getAllUsers = async ({
-  limit,
-  page,
-  search,
-  sortBy,
-  sortOrder,
-  role,
-  status,
-}: {
-  limit: number;
-  page: number;
-  search?: string;
-  sortBy: string;
-  sortOrder: string;
-  role?: any;
-  status?: any;
-}) => {
-  const skip = (page - 1) * limit;
+const getAllUsers = async (filters: any, options: any) => {
+  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+  const { search, ...filterData } = filters;
+
   const users = await prisma.user.findMany({
     skip: skip,
     take: limit,
@@ -34,8 +21,8 @@ const getAllUsers = async ({
         contains: search,
         mode: "insensitive",
       },
-      role: role,
-      status: status,
+      role: filterData.role,
+      status: filterData.status,
     },
     orderBy: {
       [sortBy]: sortOrder,
