@@ -27,6 +27,7 @@ userRoute.post(
 // create admin home work
 userRoute.post(
   "/create-admin",
+  checkAuth(UserRole.ADMIN),
   fileUploader.upload.single("file"),
   zodValidateRequest(userZodValidation.createAdminZodSchema),
   userController.createAdmin
