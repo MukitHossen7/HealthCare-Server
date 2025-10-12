@@ -13,22 +13,23 @@ const getAllUsers = async (filters: any, options: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
   const { search, ...filterData } = filters;
 
+  const whereCondition: any = {
+    email: search ? { contains: search, mode: "insensitive" } : undefined,
+    role: filterData.role,
+    status: filterData.status,
+  };
+
   const users = await prisma.user.findMany({
     skip: skip,
     take: limit,
-    where: {
-      email: {
-        contains: search,
-        mode: "insensitive",
-      },
-      role: filterData.role,
-      status: filterData.status,
-    },
+    where: whereCondition,
     orderBy: {
       [sortBy]: sortOrder,
     },
   });
-  const totalData = await prisma.user.count();
+  const totalData = await prisma.user.count({
+    where: whereCondition,
+  });
   return {
     meta: {
       page: page,
