@@ -12,10 +12,18 @@ const getAllUsers = async ({
   limit,
   page,
   search,
+  sortBy,
+  sortOrder,
+  role,
+  status,
 }: {
   limit: number;
   page: number;
   search?: string;
+  sortBy: string;
+  sortOrder: string;
+  role?: any;
+  status?: any;
 }) => {
   const skip = (page - 1) * limit;
   const users = await prisma.user.findMany({
@@ -26,6 +34,11 @@ const getAllUsers = async ({
         contains: search,
         mode: "insensitive",
       },
+      role: role,
+      status: status,
+    },
+    orderBy: {
+      [sortBy]: sortOrder,
     },
   });
   const totalData = await prisma.user.count();
