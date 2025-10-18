@@ -98,7 +98,17 @@ const scheduleForDoctor = async (filters: any, options: any) => {
   };
 };
 
+const deleteSchedule = async (id: string) => {
+  const result = await prisma.schedule.delete({
+    where: {
+      id: id,
+    },
+  });
+  return result;
+};
+
 export const scheduleService = {
   createSchedule,
   scheduleForDoctor,
+  deleteSchedule,
 };

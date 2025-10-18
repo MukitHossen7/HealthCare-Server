@@ -7,4 +7,6 @@ scheduleRoutes.post("/", scheduleController.createSchedule);
 
 scheduleRoutes.get("/", scheduleController.scheduleForDoctor);
 
+scheduleRoutes.delete("/:id", scheduleController.deleteSchedule);
+
 export default scheduleRoutes;
