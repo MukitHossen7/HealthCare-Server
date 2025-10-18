@@ -1,5 +1,6 @@
 import { addHours, addMinutes, format } from "date-fns";
 import { prisma } from "../../utils/prisma";
+import { calculatePagination } from "../../utils/pagenationHelpers";
 
 const createSchedule = async (payload: any) => {
   const { startDate, endDate, startTime, endTime } = payload;
@@ -57,6 +58,47 @@ const createSchedule = async (payload: any) => {
   return schedules;
 };
 
+const scheduleForDoctor = async (filters: any, options: any) => {
+  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+  const { startDateTime, endDateTime } = filters;
+
+  const whereCondition: any = {
+    AND: [
+      {
+        startDateTime: {
+          gte: startDateTime,
+        },
+      },
+      {
+        endDateTime: {
+          lte: endDateTime,
+        },
+      },
+    ],
+  };
+
+  const result = await prisma.schedule.findMany({
+    skip: skip,
+    take: limit,
+    where: whereCondition,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+  });
+  const totalData = await prisma.schedule.count({
+    where: whereCondition,
+  });
+  return {
+    meta: {
+      page,
+      limit,
+      total: totalData,
+    },
+    result,
+  };
+};
+
 export const scheduleService = {
   createSchedule,
+  scheduleForDoctor,
 };
