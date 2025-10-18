@@ -19,6 +19,7 @@ userRoute.post(
 
 userRoute.post(
   "/create-doctor",
+  checkAuth(UserRole.ADMIN),
   fileUploader.upload.single("file"),
   zodValidateRequest(userZodValidation.createDoctorZodSchema),
   userController.createDoctor
