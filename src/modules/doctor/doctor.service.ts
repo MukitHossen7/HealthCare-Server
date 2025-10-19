@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { calculatePagination, TOptions } from "../../utils/pagenationHelpers";
 import { prisma } from "../../utils/prisma";
+import { IDoctorInput } from "./doctor.interface";
 
 const getAllDoctors = async (options: TOptions, filters: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
@@ -60,6 +61,23 @@ const getAllDoctors = async (options: TOptions, filters: any) => {
   };
 };
 
+const updateDoctors = async (id: string, payload: Partial<IDoctorInput>) => {
+  const isDoctor = await prisma.doctor.findUniqueOrThrow({
+    where: {
+      id: id,
+    },
+  });
+
+  const updateDoctor = await prisma.doctor.update({
+    where: {
+      id: id,
+    },
+    data: payload,
+  });
+  return updateDoctor;
+};
+
 export const doctorServices = {
   getAllDoctors,
+  updateDoctors,
 };
