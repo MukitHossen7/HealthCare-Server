@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { calculatePagination, TOptions } from "../../utils/pagenationHelpers";
 import { prisma } from "../../utils/prisma";
-import { IDoctorInput } from "./doctor.interface";
+import { IDoctorUpdateInput } from "./doctor.interface";
 
 const getAllDoctors = async (options: TOptions, filters: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
@@ -42,6 +42,13 @@ const getAllDoctors = async (options: TOptions, filters: any) => {
 
   const result = await prisma.doctor.findMany({
     where: whereCondition,
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true,
+        },
+      },
+    },
     skip: skip,
     take: limit,
     orderBy: {
@@ -61,18 +68,56 @@ const getAllDoctors = async (options: TOptions, filters: any) => {
   };
 };
 
-const updateDoctors = async (id: string, payload: Partial<IDoctorInput>) => {
+const updateDoctors = async (
+  id: string,
+  payload: Partial<IDoctorUpdateInput>
+) => {
+  const { specialties, ...doctorData } = payload;
   const isDoctor = await prisma.doctor.findUniqueOrThrow({
     where: {
       id: id,
     },
   });
 
+  if (specialties && specialties.length > 0) {
+    const deleteSpecialtyIds = specialties.filter(
+      (specialty) => specialty.isDeleted
+    );
+
+    for (const specialty of deleteSpecialtyIds) {
+      await prisma.doctorSpecialties.deleteMany({
+        where: {
+          doctorId: isDoctor.id,
+          specialtiesId: specialty.specialtyId,
+        },
+      });
+    }
+    const createSpecialtyIds = specialties.filter(
+      (specialty) => !specialty.isDeleted
+    );
+
+    for (const specialty of createSpecialtyIds) {
+      await prisma.doctorSpecialties.create({
+        data: {
+          doctorId: isDoctor.id,
+          specialtiesId: specialty.specialtyId,
+        },
+      });
+    }
+  }
+
   const updateDoctor = await prisma.doctor.update({
     where: {
       id: id,
     },
-    data: payload,
+    data: doctorData,
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true,
+        },
+      },
+    },
   });
   return updateDoctor;
 };

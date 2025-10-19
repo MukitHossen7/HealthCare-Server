@@ -1,6 +1,6 @@
 import { Gender } from "@prisma/client";
 
-export interface IDoctorInput {
+export interface IDoctorUpdateInput {
   id?: string;
   name: string;
   email: string;
@@ -13,4 +13,8 @@ export interface IDoctorInput {
   qualification: string;
   currentWorkingPlace: string;
   designation: string;
+  specialties: {
+    specialtyId: string;
+    isDeleted?: boolean;
+  }[];
 }
