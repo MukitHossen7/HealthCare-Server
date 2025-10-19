@@ -4,6 +4,7 @@ import authRoute from "../modules/auth/auth.routes";
 import scheduleRoutes from "../modules/schedule/schedule.routes";
 import doctorScheduleRoutes from "../modules/doctorSchedule/doctorSchedule.routes";
 import specialtiesRoutes from "../modules/specialties/specialties.routes";
+import doctorsRoutes from "../modules/doctor/doctor.routes";
 
 const routes = Router();
 
@@ -12,5 +13,6 @@ routes.use("/auth", authRoute);
 routes.use("/schedule", scheduleRoutes);
 routes.use("/doctor-schedule", doctorScheduleRoutes);
 routes.use("/specialties", specialtiesRoutes);
+routes.use("/doctors", doctorsRoutes);
 
 export default routes;
