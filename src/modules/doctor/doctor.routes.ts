@@ -9,7 +9,7 @@ doctorsRoutes.get("/", doctorController.getAllDoctors);
 
 doctorsRoutes.patch(
   "/:id",
-  checkAuth(UserRole.ADMIN, UserRole.DOCTOR),
+  checkAuth(UserRole.DOCTOR),
   doctorController.updateDoctors
 );
 

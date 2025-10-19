@@ -12,6 +12,7 @@ const getAllDoctors = catchAsync(async (req: Request, res: Response) => {
     "experience",
     "gender",
     "appointmentFee",
+    "specialties",
   ]);
   const result = await doctorServices.getAllDoctors(options, filters);
   sendResponse(res, {
