@@ -6,12 +6,22 @@ import { pick } from "../../utils/pick";
 
 const getAllDoctors = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-  const result = await doctorServices.getAllDoctors(options);
+  const filters = pick(req.query, [
+    "search",
+    "contactNumber",
+    "experience",
+    "gender",
+    "appointmentFee",
+  ]);
+  const result = await doctorServices.getAllDoctors(options, filters);
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: "Doctors Retrieve successfully",
-    data: result,
+    data: {
+      meta: result.meta,
+      data: result.data,
+    },
   });
 });
 
