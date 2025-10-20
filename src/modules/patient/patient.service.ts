@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Patient, Prisma } from "@prisma/client";
 import { calculatePagination, TOptions } from "../../utils/pagenationHelpers";
 import { prisma } from "../../utils/prisma";
 
@@ -55,11 +55,44 @@ const getAllPatient = async (options: TOptions, filters: any) => {
   };
 };
 
-const getPatientById = async (id: string) => {};
+const getPatientById = async (id: string) => {
+  const result = await prisma.patient.findUniqueOrThrow({
+    where: {
+      id: id,
+    },
+  });
+  return result;
+};
 
-const updatePatient = async (id: string) => {};
+const updatePatient = async (id: string, payload: Partial<Patient>) => {
+  const patientData = await prisma.patient.findUniqueOrThrow({
+    where: {
+      id: id,
+    },
+  });
 
-const deletePatient = async (id: string) => {};
+  const result = await prisma.patient.update({
+    where: {
+      id: patientData.id,
+    },
+    data: payload,
+  });
+  return result;
+};
+
+const deletePatient = async (id: string) => {
+  const patientData = await prisma.patient.findUniqueOrThrow({
+    where: {
+      id: id,
+    },
+  });
+  const result = await prisma.patient.delete({
+    where: {
+      id: patientData.id,
+    },
+  });
+  return result;
+};
 
 export const patientServices = {
   getAllPatient,
