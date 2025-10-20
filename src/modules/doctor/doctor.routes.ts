@@ -5,6 +5,8 @@ import { UserRole } from "@prisma/client";
 
 const doctorsRoutes = express.Router();
 
+doctorsRoutes.post("/suggestion", doctorController.getAISuggestions);
+
 doctorsRoutes.get("/", doctorController.getAllDoctors);
 
 doctorsRoutes.get("/:id", doctorController.getDoctorById);

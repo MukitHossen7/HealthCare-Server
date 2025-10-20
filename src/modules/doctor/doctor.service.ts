@@ -2,6 +2,9 @@ import { Prisma } from "@prisma/client";
 import { calculatePagination, TOptions } from "../../utils/pagenationHelpers";
 import { prisma } from "../../utils/prisma";
 import { IDoctorUpdateInput } from "./doctor.interface";
+import AppError from "../../errorHelpers/AppError";
+import HttpStatus from "http-status";
+import { openai } from "../../utils/openRouter";
 
 const getAllDoctors = async (options: TOptions, filters: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
@@ -81,6 +84,55 @@ const getAllDoctors = async (options: TOptions, filters: any) => {
     },
     data: result,
   };
+};
+
+const getAISuggestions = async (payload: { symptom: string }) => {
+  console.log(payload);
+  if (!(payload && payload.symptom)) {
+    throw new AppError(HttpStatus.BAD_REQUEST, "Symptom is required");
+  }
+
+  const doctors = await prisma.doctor.findMany({
+    where: {
+      user: {
+        isDeleted: false,
+      },
+    },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true,
+        },
+      },
+    },
+  });
+
+  const prompt = `
+  You are a professional medical assistant AI.
+  A patient reports the following symptom: "${payload.symptom}".
+  Based on the list of doctors and their specialties below, suggest the top 3 most relevant doctors. 
+  Symptoms: ${payload.symptom}
+  Here is the doctor list (in JSON):
+  ${JSON.stringify(doctors, null, 2)}
+  Return response in this JSON format with full individual doctor data.
+  `;
+
+  const completion = await openai.chat.completions.create({
+    model: "z-ai/glm-4.5-air:free",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a helpful AI medical assistant that provides doctor suggestions",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
+
+  // console.log(doctors);
 };
 
 const getDoctorById = async (id: string) => {
@@ -177,4 +229,5 @@ export const doctorServices = {
   updateDoctors,
   deleteDoctor,
   getDoctorById,
+  getAISuggestions,
 };
