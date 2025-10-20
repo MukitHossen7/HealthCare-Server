@@ -87,7 +87,6 @@ const getAllDoctors = async (options: TOptions, filters: any) => {
 };
 
 const getAISuggestions = async (payload: { symptom: string }) => {
-  console.log(payload);
   if (!(payload && payload.symptom)) {
     throw new AppError(HttpStatus.BAD_REQUEST, "Symptom is required");
   }
@@ -108,14 +107,45 @@ const getAISuggestions = async (payload: { symptom: string }) => {
   });
 
   const prompt = `
-  You are a professional medical assistant AI.
-  A patient reports the following symptom: "${payload.symptom}".
-  Based on the list of doctors and their specialties below, suggest the top 3 most relevant doctors. 
-  Symptoms: ${payload.symptom}
-  Here is the doctor list (in JSON):
-  ${JSON.stringify(doctors, null, 2)}
-  Return response in this JSON format with full individual doctor data.
-  `;
+You are a professional AI medical assistant. 
+
+A patient reports the following symptom: "${payload.symptom}". 
+Your task is to recommend the **top most relevant doctors** from the list provided below.
+
+Follow these strict rules:
+1. Only suggest doctors whose specialty **matches the symptom**.
+2. Do NOT invent doctors or specialties.
+3. Do NOT provide unnecessary explanations or unrelated text.
+4. Return only **valid JSON** in this exact format:
+
+{
+  "recommendedDoctors": [
+    {
+      "id": "...",
+      "name": "...",
+      "email": "...",
+      "profilePhoto": "...",
+      "contactNumber": "...",
+      "address": "...",
+      "registrationNumber": "...",
+      "experience": "...",
+      "gender": "...",
+      "appointmentFee": "...",
+      "qualification": "...",
+      "currentWorkingPlace": "...",
+      "designation": "...",
+      "specialties": [
+        { "title": "Specialty Title 1", "icon": "Icon URL 1" },
+        { "title": "Specialty Title 2", "icon": "Icon URL 2" }
+      ],
+      "reason": "One sentence why this doctor is recommended for this symptom"
+    }
+  ]
+}
+
+Doctor List (use only doctors from this list):
+${JSON.stringify(doctors, null, 2)}
+`;
 
   const completion = await openai.chat.completions.create({
     model: "z-ai/glm-4.5-air:free",
@@ -132,7 +162,25 @@ const getAISuggestions = async (payload: { symptom: string }) => {
     ],
   });
 
-  // console.log(doctors);
+  const aiMessage = completion.choices[0]?.message?.content;
+  if (!aiMessage) {
+    throw new AppError(
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      "AI did not return any message"
+    );
+  }
+
+  const cleanMessage = aiMessage.replace(/```json|```/g, "").trim();
+
+  let aiResult;
+
+  try {
+    aiResult = JSON.parse(cleanMessage);
+  } catch (err) {
+    console.error("AI response is not valid JSON", err);
+    aiResult = { message: aiMessage }; // fallback
+  }
+  return aiResult;
 };
 
 const getDoctorById = async (id: string) => {

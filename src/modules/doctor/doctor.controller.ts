@@ -32,7 +32,7 @@ const getAISuggestions = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: "AI suggestions fetched successfully",
-    data: result,
+    data: result.recommendedDoctors,
   });
 });
 
