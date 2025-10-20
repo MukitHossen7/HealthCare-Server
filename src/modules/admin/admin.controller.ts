@@ -6,13 +6,16 @@ import sendResponse from "../../utils/sendResponse";
 
 const getAllAdmin = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-  const filters = pick(req.query, ["search"]);
+  const filters = pick(req.query, ["search", "contactNumber", "name"]);
   const result = await adminServices.getAllAdmin(options, filters);
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: "All Admin Retrieve successfully",
-    data: result,
+    data: {
+      meta: result.meta,
+      data: result.data,
+    },
   });
 });
 
@@ -29,7 +32,7 @@ const getAdminById = catchAsync(async (req: Request, res: Response) => {
 
 const updateAdmin = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const result = await adminServices.updateAdmin(id);
+  const result = await adminServices.updateAdmin(id, req.body);
   sendResponse(res, {
     statusCode: 200,
     success: true,
