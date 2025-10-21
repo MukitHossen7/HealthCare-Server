@@ -52,7 +52,15 @@ const createAppointment = async (
         isBooked: true,
       },
     });
+    const transactionId = uuidv4();
 
+    await tnx.payment.create({
+      data: {
+        appointmentId: appointmentData.id,
+        amount: doctorData.appointmentFee,
+        transactionId: transactionId,
+      },
+    });
     return appointmentData;
   });
 
