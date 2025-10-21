@@ -90,7 +90,6 @@ const getAISuggestions = async (payload: { symptom: string }) => {
   if (!(payload && payload.symptom)) {
     throw new AppError(HttpStatus.BAD_REQUEST, "Symptom is required");
   }
-
   const doctors = await prisma.doctor.findMany({
     where: {
       user: {
@@ -187,11 +186,19 @@ const getDoctorById = async (id: string) => {
   const doctorData = await prisma.doctor.findUniqueOrThrow({
     where: {
       id: id,
+      user: {
+        isDeleted: false,
+      },
     },
     include: {
       doctorSpecialties: {
         include: {
           specialties: true,
+        },
+      },
+      doctorSchedules: {
+        include: {
+          schedule: true,
         },
       },
     },
@@ -263,9 +270,12 @@ const deleteDoctor = async (id: string) => {
     },
   });
 
-  const result = await prisma.doctor.delete({
+  const result = await prisma.user.update({
     where: {
-      id: doctorData.id,
+      email: doctorData.email,
+    },
+    data: {
+      isDeleted: true,
     },
   });
 
