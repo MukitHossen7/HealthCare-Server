@@ -11,4 +11,10 @@ appointmentRoutes.post(
   appointmentController.createAppointment
 );
 
+appointmentRoutes.get(
+  "/my-appointment",
+  checkAuth(UserRole.PATIENT, UserRole.DOCTOR),
+  appointmentController.getMyAppointment
+);
+
 export default appointmentRoutes;

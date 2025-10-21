@@ -4,6 +4,8 @@ import { prisma } from "../../utils/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { stripe } from "../../config/stripe.config";
 import config from "../../config";
+import { calculatePagination, TOptions } from "../../utils/pagenationHelpers";
+
 const createAppointment = async (
   payload: Partial<Appointment>,
   user: IJwtPayload
@@ -96,6 +98,16 @@ const createAppointment = async (
   return result;
 };
 
+const getMyAppointment = async (
+  options: TOptions,
+  filters: any,
+  user: IJwtPayload
+) => {
+  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+  const { ...filterData } = filters;
+};
+
 export const appointmentServices = {
   createAppointment,
+  getMyAppointment,
 };
