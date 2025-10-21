@@ -5,9 +5,16 @@ import config from "./config";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import notFound from "./middlewares/notFound";
 import routes from "./routes/routes";
+import { paymentController } from "./modules/payment/payment.controller";
 
 const app = express();
 //parser
+
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  paymentController.handleStripeWebhookEvent
+);
 
 app.use(express.json());
 app.use(cookieParser());
