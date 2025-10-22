@@ -12,6 +12,12 @@ appointmentRoutes.post(
 );
 
 appointmentRoutes.get(
+  "/",
+  checkAuth(UserRole.ADMIN),
+  appointmentController.getAllAppointments
+);
+
+appointmentRoutes.get(
   "/my-appointment",
   checkAuth(UserRole.PATIENT, UserRole.DOCTOR),
   appointmentController.getMyAppointment
@@ -22,7 +28,5 @@ appointmentRoutes.patch(
   checkAuth(UserRole.DOCTOR),
   appointmentController.updateAppointmentStatus
 );
-
-//task get all data from db(appointment data) Admin
 
 export default appointmentRoutes;

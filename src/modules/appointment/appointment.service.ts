@@ -202,8 +202,55 @@ const updateAppointmentStatus = async (
 
   return updateAppointment;
 };
+
+const getAllAppointments = async (options: TOptions, filters: any) => {
+  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+  const { ...filterData } = filters;
+
+  const andConditions: Prisma.AppointmentWhereInput[] = [];
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.entries(filterData).map(([field, value]) => ({
+        [field]: {
+          equals: value,
+        },
+      })),
+    });
+  }
+
+  const whereCondition: Prisma.AppointmentWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.appointment.findMany({
+    where: whereCondition,
+    skip: skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      patient: true,
+      doctor: true,
+    },
+  });
+
+  const totalData = await prisma.appointment.count({
+    where: whereCondition,
+  });
+  return {
+    meta: {
+      page: page,
+      limit: limit,
+      total: totalData,
+    },
+    data: result,
+  };
+};
+
 export const appointmentServices = {
   createAppointment,
   getMyAppointment,
   updateAppointmentStatus,
+  getAllAppointments,
 };
