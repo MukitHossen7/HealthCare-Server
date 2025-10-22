@@ -1,10 +1,18 @@
-import { Appointment, PaymentStatus, Prisma, UserRole } from "@prisma/client";
+import {
+  Appointment,
+  AppointmentStatus,
+  PaymentStatus,
+  Prisma,
+  UserRole,
+} from "@prisma/client";
 import { IJwtPayload } from "../../types/common";
 import { prisma } from "../../utils/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { stripe } from "../../config/stripe.config";
 import config from "../../config";
 import { calculatePagination, TOptions } from "../../utils/pagenationHelpers";
+import AppError from "../../errorHelpers/AppError";
+import httpStatus from "http-status";
 
 const createAppointment = async (
   payload: Partial<Appointment>,
@@ -162,7 +170,40 @@ const getMyAppointment = async (
   };
 };
 
+const updateAppointmentStatus = async (
+  appointmentId: string,
+  status: AppointmentStatus,
+  user: IJwtPayload
+) => {
+  const appointmentData = await prisma.appointment.findUniqueOrThrow({
+    where: {
+      id: appointmentId,
+      paymentStatus: PaymentStatus.PAID,
+    },
+    include: {
+      doctor: true,
+    },
+  });
+
+  if (user.role === UserRole.DOCTOR) {
+    if (user.email !== appointmentData.doctor.email) {
+      throw new AppError(httpStatus.BAD_REQUEST, "This is not you appointment");
+    }
+  }
+
+  const updateAppointment = await prisma.appointment.update({
+    where: {
+      id: appointmentId,
+    },
+    data: {
+      status: status,
+    },
+  });
+
+  return updateAppointment;
+};
 export const appointmentServices = {
   createAppointment,
   getMyAppointment,
+  updateAppointmentStatus,
 };

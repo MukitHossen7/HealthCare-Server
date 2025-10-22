@@ -17,4 +17,12 @@ appointmentRoutes.get(
   appointmentController.getMyAppointment
 );
 
+appointmentRoutes.patch(
+  "/status/:id",
+  checkAuth(UserRole.DOCTOR),
+  appointmentController.updateAppointmentStatus
+);
+
+//task get all data from db(appointment data) Admin
+
 export default appointmentRoutes;
