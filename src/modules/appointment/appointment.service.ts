@@ -1,4 +1,4 @@
-import { Appointment } from "@prisma/client";
+import { Appointment, PaymentStatus, Prisma, UserRole } from "@prisma/client";
 import { IJwtPayload } from "../../types/common";
 import { prisma } from "../../utils/prisma";
 import { v4 as uuidv4 } from "uuid";
@@ -105,6 +105,61 @@ const getMyAppointment = async (
 ) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
   const { ...filterData } = filters;
+
+  const andConditions: Prisma.AppointmentWhereInput[] = [];
+
+  if (user.role === UserRole.PATIENT) {
+    andConditions.push({
+      patient: {
+        email: user.email,
+      },
+    });
+  }
+
+  if (user.role === UserRole.DOCTOR) {
+    andConditions.push({
+      doctor: {
+        email: user.email,
+      },
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.entries(filterData).map(([field, value]) => ({
+        [field]: {
+          equals: value,
+        },
+      })),
+    });
+  }
+
+  const whereCondition: Prisma.AppointmentWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.appointment.findMany({
+    where: whereCondition,
+    skip: skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include:
+      user.role === UserRole.DOCTOR ? { patient: true } : { doctor: true },
+  });
+
+  const totalData = await prisma.appointment.count({
+    where: whereCondition,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total: totalData,
+    },
+    data: result,
+  };
 };
 
 export const appointmentServices = {

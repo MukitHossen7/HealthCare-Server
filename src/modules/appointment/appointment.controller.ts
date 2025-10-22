@@ -33,7 +33,10 @@ const getMyAppointment = catchAsync(
       statusCode: 200,
       success: true,
       message: "My Appointment Retrieve successfully",
-      data: result,
+      data: {
+        meta: result.meta,
+        data: result.data,
+      },
     });
   }
 );
