@@ -10,6 +10,8 @@ const userRoute = express.Router();
 
 userRoute.get("/", checkAuth(UserRole.ADMIN), userController.getAllUsers);
 
+userRoute.get("/me", userController.getMe);
+
 userRoute.post(
   "/create-patient",
   fileUploader.upload.single("file"),
@@ -25,7 +27,6 @@ userRoute.post(
   userController.createDoctor
 );
 
-// create admin home work
 userRoute.post(
   "/create-admin",
   checkAuth(UserRole.ADMIN),

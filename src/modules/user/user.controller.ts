@@ -28,6 +28,17 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const userSession = req.cookies;
+  const result = await userServices.getMe(userSession);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User get own profile data successfully",
+    data: result,
+  });
+});
+
 const createPatient = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
   const file = req.file;
@@ -66,6 +77,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
 export const userController = {
   getAllUsers,
+  getMe,
   createPatient,
   createDoctor,
   createAdmin,
