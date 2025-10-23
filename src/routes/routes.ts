@@ -8,6 +8,7 @@ import doctorsRoutes from "../modules/doctor/doctor.routes";
 import patientRoutes from "../modules/patient/patient.routes";
 import adminRoutes from "../modules/admin/admin.routes";
 import appointmentRoutes from "../modules/appointment/appointment.routes";
+import prescriptionRoutes from "../modules/prescription/prescription.routes";
 
 const routes = Router();
 
@@ -20,5 +21,6 @@ routes.use("/doctors", doctorsRoutes);
 routes.use("/patients", patientRoutes);
 routes.use("/admins", adminRoutes);
 routes.use("/appointments", appointmentRoutes);
+routes.use("/prescriptions", prescriptionRoutes);
 
 export default routes;
