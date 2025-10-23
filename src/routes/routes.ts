@@ -9,6 +9,7 @@ import patientRoutes from "../modules/patient/patient.routes";
 import adminRoutes from "../modules/admin/admin.routes";
 import appointmentRoutes from "../modules/appointment/appointment.routes";
 import prescriptionRoutes from "../modules/prescription/prescription.routes";
+import reviewRoutes from "../modules/review/review.routes";
 
 const routes = Router();
 
@@ -22,5 +23,6 @@ routes.use("/patients", patientRoutes);
 routes.use("/admins", adminRoutes);
 routes.use("/appointments", appointmentRoutes);
 routes.use("/prescriptions", prescriptionRoutes);
+routes.use("/reviews", reviewRoutes);
 
 export default routes;
