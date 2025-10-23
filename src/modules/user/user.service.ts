@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole, UserStatus } from "@prisma/client";
 import config from "../../config";
 import { IJwtPayload } from "../../types/common";
 import { fileUploader } from "../../utils/fileUploader";
@@ -212,10 +212,31 @@ const createAdmin = async (
   return createData;
 };
 
+const changeProfileStatus = async (
+  id: string,
+  payload: { status: UserStatus }
+) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: id,
+    },
+  });
+
+  const updateStatus = await prisma.user.update({
+    where: {
+      id: userData.id,
+    },
+    data: {
+      status: payload.status,
+    },
+  });
+  return updateStatus;
+};
 export const userServices = {
   getMyProfile,
   createPatient,
   createDoctor,
   createAdmin,
   getAllUsers,
+  changeProfileStatus,
 };

@@ -39,4 +39,10 @@ userRoute.post(
   userController.createAdmin
 );
 
+userRoute.patch(
+  "/:id/status",
+  checkAuth(UserRole.ADMIN),
+  userController.changeProfileStatus
+);
+
 export default userRoute;
