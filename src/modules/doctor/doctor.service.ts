@@ -66,6 +66,7 @@ const getAllDoctors = async (options: TOptions, filters: any) => {
           specialties: true,
         },
       },
+      reviews: true,
     },
     skip: skip,
     take: limit,
@@ -201,6 +202,7 @@ const getDoctorById = async (id: string) => {
           schedule: true,
         },
       },
+      reviews: true,
     },
   });
 
