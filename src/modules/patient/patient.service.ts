@@ -1,6 +1,8 @@
 import { Patient, Prisma } from "@prisma/client";
 import { calculatePagination, TOptions } from "../../utils/pagenationHelpers";
 import { prisma } from "../../utils/prisma";
+import { IJwtPayload } from "../../types/common";
+import AppError from "../../errorHelpers/AppError";
 
 const getAllPatient = async (options: TOptions, filters: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
@@ -64,33 +66,85 @@ const getPatientById = async (id: string) => {
   return result;
 };
 
-const updatePatient = async (id: string, payload: Partial<Patient>) => {
-  const patientData = await prisma.patient.findUniqueOrThrow({
-    where: {
-      id: id,
-    },
-  });
-
-  const result = await prisma.patient.update({
-    where: {
-      id: patientData.id,
-    },
-    data: payload,
-  });
-  return result;
-};
-
 const deletePatient = async (id: string) => {
   const patientData = await prisma.patient.findUniqueOrThrow({
     where: {
       id: id,
     },
   });
-  const result = await prisma.patient.delete({
+  const result = await prisma.user.update({
     where: {
-      id: patientData.id,
+      email: patientData.email,
+    },
+    data: {
+      isDeleted: true,
     },
   });
+  return result;
+};
+
+const updatePatient = async (
+  patientId: string,
+  payload: any,
+  user: IJwtPayload
+) => {
+  const { patientHealthData, medicalReport, ...patientInfo } = payload;
+  const patientData = await prisma.patient.findUniqueOrThrow({
+    where: {
+      email: user.email,
+    },
+  });
+
+  if (patientId !== patientData.id) {
+    throw new AppError(
+      403,
+      "You are not authorized to update this patient information"
+    );
+  }
+
+  const result = await prisma.$transaction(async (tnx) => {
+    await tnx.patient.update({
+      where: {
+        id: patientData.id,
+      },
+      data: patientInfo,
+    });
+
+    if (patientHealthData) {
+      await tnx.patientHealthData.upsert({
+        where: {
+          patientId: patientData.id,
+        },
+        update: patientHealthData,
+        create: {
+          ...patientHealthData,
+          patientId: patientData.id,
+        },
+      });
+    }
+
+    if (medicalReport) {
+      await tnx.medicalReport.create({
+        data: {
+          ...medicalReport,
+          patientId: patientData.id,
+        },
+      });
+    }
+
+    const updateData = await tnx.patient.findUnique({
+      where: {
+        id: patientData.id,
+      },
+      include: {
+        patientHealthData: true,
+        medicalReports: true,
+      },
+    });
+
+    return updateData;
+  });
+
   return result;
 };
 

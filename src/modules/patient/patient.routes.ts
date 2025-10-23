@@ -11,7 +11,7 @@ patientRoutes.get("/:id", patientController.getPatientById);
 
 patientRoutes.patch(
   "/:id",
-  checkAuth(UserRole.PATIENT, UserRole.ADMIN),
+  checkAuth(UserRole.PATIENT),
   patientController.updatePatient
 );
 

@@ -3,6 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import { pick } from "../../utils/pick";
 import sendResponse from "../../utils/sendResponse";
 import { patientServices } from "./patient.service";
+import { IJwtPayload } from "../../types/common";
 
 const getAllPatient = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
@@ -30,16 +31,23 @@ const getPatientById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updatePatient = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const result = await patientServices.updatePatient(id, req.body);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Patient update successfully",
-    data: result,
-  });
-});
+const updatePatient = catchAsync(
+  async (req: Request & { user?: any }, res: Response) => {
+    const patientId = req.params.id;
+    const user = req.user as IJwtPayload;
+    const result = await patientServices.updatePatient(
+      patientId,
+      req.body,
+      user
+    );
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Patient update successfully",
+      data: result,
+    });
+  }
+);
 
 const deletePatient = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;

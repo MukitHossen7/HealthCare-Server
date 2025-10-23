@@ -88,9 +88,12 @@ const deleteAdmin = async (id: string) => {
     },
   });
 
-  const result = await prisma.admin.delete({
+  const result = await prisma.user.update({
     where: {
-      id: adminData.id,
+      email: adminData.email,
+    },
+    data: {
+      isDeleted: true,
     },
   });
 
