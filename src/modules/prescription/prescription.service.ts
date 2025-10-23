@@ -3,6 +3,7 @@ import { IJwtPayload } from "../../types/common";
 import { prisma } from "../../utils/prisma";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status";
+import { calculatePagination, TOptions } from "../../utils/pagenationHelpers";
 
 const createPrescription = async (
   user: IJwtPayload,
@@ -36,6 +37,45 @@ const createPrescription = async (
   return result;
 };
 
+const patientPrescription = async (user: IJwtPayload, options: TOptions) => {
+  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+
+  const prescriptionData = await prisma.prescription.findMany({
+    where: {
+      patient: {
+        email: user.email,
+      },
+    },
+    skip: skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      patient: true,
+      doctor: true,
+    },
+  });
+
+  const totalData = await prisma.prescription.count({
+    where: {
+      patient: {
+        email: user.email,
+      },
+    },
+  });
+
+  return {
+    meta: {
+      page,
+      limit: limit,
+      total: totalData,
+    },
+    data: prescriptionData,
+  };
+};
+
 export const prescriptionServices = {
   createPrescription,
+  patientPrescription,
 };
