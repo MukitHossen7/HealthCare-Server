@@ -4,6 +4,17 @@ import sendResponse from "../../utils/sendResponse";
 import { authServices } from "./auth.service";
 import { setAuthCookie } from "../../utils/setCookie";
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const userSession = req.cookies;
+  const result = await authServices.getMe(userSession);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User get own profile data successfully",
+    data: result,
+  });
+});
+
 const createLogin = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
   const result = await authServices.createLogin(payload);
@@ -22,5 +33,6 @@ const createLogin = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const authController = {
+  getMe,
   createLogin,
 };

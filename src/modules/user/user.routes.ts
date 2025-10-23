@@ -10,7 +10,11 @@ const userRoute = express.Router();
 
 userRoute.get("/", checkAuth(UserRole.ADMIN), userController.getAllUsers);
 
-userRoute.get("/me", userController.getMe);
+userRoute.get(
+  "/my-profile",
+  checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  userController.getMyProfile
+);
 
 userRoute.post(
   "/create-patient",

@@ -1,8 +1,7 @@
-import { JwtPayload } from "jsonwebtoken";
+import { UserRole } from "@prisma/client";
 import config from "../../config";
-import AppError from "../../errorHelpers/AppError";
+import { IJwtPayload } from "../../types/common";
 import { fileUploader } from "../../utils/fileUploader";
-import { verifyToken } from "../../utils/jwt";
 import { calculatePagination } from "../../utils/pagenationHelpers";
 import { prisma } from "../../utils/prisma";
 import {
@@ -11,8 +10,6 @@ import {
   ICreatePatientInput,
 } from "./user.interface";
 import bcrypt from "bcryptjs";
-import httpStatus from "http-status";
-import { UserStatus } from "@prisma/client";
 
 const getAllUsers = async (filters: any, options: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
@@ -45,61 +42,53 @@ const getAllUsers = async (filters: any, options: any) => {
   };
 };
 
-const getMe = async (userSession: any) => {
-  const accessToken = userSession.accessToken;
-  if (!accessToken) {
-    throw new AppError(httpStatus.FORBIDDEN, "Access token is missing");
-  }
-
-  const decodedData = verifyToken(
-    accessToken,
-    config.JWT.ACCESS_TOKEN_SECRET
-  ) as JwtPayload;
-
-  const userData = await prisma.user.findUnique({
+const getMyProfile = async (user: IJwtPayload) => {
+  const userData = await prisma.user.findUniqueOrThrow({
     where: {
-      email: decodedData.email,
+      email: user.email,
+    },
+    select: {
+      id: true,
+      email: true,
+      needPasswordChange: true,
+      role: true,
+      status: true,
+      isDeleted: true,
+      isVerified: true,
     },
   });
 
-  if (!userData) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Email does not exist");
-  }
-  if (userData.isDeleted === true) {
-    throw new AppError(httpStatus.FORBIDDEN, "Your account is deleted");
-  }
-  if (
-    userData.status === UserStatus.BLOCKED ||
-    userData.status === UserStatus.INACTIVE
-  ) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      `Your account is ${userData.status}`
-    );
+  let profileData;
+  //patient
+  if (userData.role === UserRole.PATIENT) {
+    profileData = await prisma.patient.findUnique({
+      where: {
+        email: userData.email,
+      },
+    });
   }
 
-  const {
-    id,
-    email,
-    role,
-    needPasswordChange,
-    status,
-    isDeleted,
-    isVerified,
-    createdAt,
-    updatedAt,
-  } = userData;
+  // doctor
+  if (userData.role === UserRole.DOCTOR) {
+    profileData = await prisma.doctor.findUnique({
+      where: {
+        email: userData.email,
+      },
+    });
+  }
+
+  //admin
+  if (userData.role === UserRole.ADMIN) {
+    profileData = await prisma.admin.findUnique({
+      where: {
+        email: userData.email,
+      },
+    });
+  }
 
   return {
-    id,
-    email,
-    role,
-    needPasswordChange,
-    status,
-    isDeleted,
-    isVerified,
-    createdAt,
-    updatedAt,
+    ...userData,
+    ...profileData,
   };
 };
 
@@ -224,7 +213,7 @@ const createAdmin = async (
 };
 
 export const userServices = {
-  getMe,
+  getMyProfile,
   createPatient,
   createDoctor,
   createAdmin,

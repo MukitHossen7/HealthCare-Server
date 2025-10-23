@@ -3,6 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import { userServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
 import { pick } from "../../utils/pick";
+import { IJwtPayload } from "../../types/common";
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, ["search", "role", "status"]);
@@ -28,16 +29,18 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getMe = catchAsync(async (req: Request, res: Response) => {
-  const userSession = req.cookies;
-  const result = await userServices.getMe(userSession);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "User get own profile data successfully",
-    data: result,
-  });
-});
+const getMyProfile = catchAsync(
+  async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const user = req.user as IJwtPayload;
+    const result = await userServices.getMyProfile(user);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Retrieve my profile data successfully",
+      data: result,
+    });
+  }
+);
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
@@ -77,7 +80,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
 export const userController = {
   getAllUsers,
-  getMe,
+  getMyProfile,
   createPatient,
   createDoctor,
   createAdmin,
