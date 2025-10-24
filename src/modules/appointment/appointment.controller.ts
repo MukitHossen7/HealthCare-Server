@@ -18,6 +18,22 @@ const createAppointment = catchAsync(
   }
 );
 
+const getAllAppointments = catchAsync(async (req: Request, res: Response) => {
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const filters = pick(req.query, ["status", "paymentStatus"]);
+
+  const result = await appointmentServices.getAllAppointments(options, filters);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "My Appointment Retrieve successfully",
+    data: {
+      meta: result.meta,
+      data: result.data,
+    },
+  });
+});
+
 const getMyAppointment = catchAsync(
   async (req: Request & { user?: IJwtPayload }, res: Response) => {
     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
@@ -59,22 +75,6 @@ const updateAppointmentStatus = catchAsync(
     });
   }
 );
-
-const getAllAppointments = catchAsync(async (req: Request, res: Response) => {
-  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-  const filters = pick(req.query, ["status", "paymentStatus"]);
-
-  const result = await appointmentServices.getAllAppointments(options, filters);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "My Appointment Retrieve successfully",
-    data: {
-      meta: result.meta,
-      data: result.data,
-    },
-  });
-});
 
 export const appointmentController = {
   createAppointment,
