@@ -9,7 +9,7 @@ const getDashboardMetaData = async (user: IJwtPayload) => {
 
   switch (user.role) {
     case UserRole.ADMIN:
-      metadata = "admin meta data";
+      metadata = await getAdminMetaData();
       break;
     case UserRole.DOCTOR:
       metadata = "doctor meta data";
@@ -38,6 +38,48 @@ const getAdminMetaData = async () => {
       status: PaymentStatus.PAID,
     },
   });
+
+  const barChartData = await getBarChartData();
+  const peiChartData = await getPieChartData();
+
+  return {
+    totalPatient,
+    totalDoctor,
+    totalAdmin,
+    totalAppointment,
+    totalPayment,
+    totalRevenue,
+    barChartData,
+    peiChartData,
+  };
+};
+
+const getBarChartData = async () => {
+  const appointmentCountPerMonth = await prisma.$queryRaw`
+  SELECT 
+  DATE_TRUNC('month',"createdAt") AS month,
+  CAST(COUNT(*) AS INTEGER) AS count
+  FROM "appointments" 
+  GROUP BY month
+  ORDER BY month ASC`;
+
+  return appointmentCountPerMonth;
+};
+
+const getPieChartData = async () => {
+  const appointmentStatusDistribution = await prisma.appointment.groupBy({
+    by: ["status"],
+    _count: {
+      id: true,
+    },
+  });
+  const formatAppointmentStatusDistribution = appointmentStatusDistribution.map(
+    ({ status, _count }) => ({
+      status,
+      count: Number(_count.id),
+    })
+  );
+  return formatAppointmentStatusDistribution;
 };
 
 export const metaServices = {
