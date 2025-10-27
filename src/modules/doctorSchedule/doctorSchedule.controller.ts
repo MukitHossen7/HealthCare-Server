@@ -3,6 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import { doctorScheduleService } from "./doctorSchedule.service";
 import sendResponse from "../../utils/sendResponse";
 import { IJwtPayload } from "../../types/common";
+import { pick } from "../../utils/pick";
 
 const createDoctorSchedule = catchAsync(
   async (req: Request & { user?: IJwtPayload }, res: Response) => {
@@ -30,7 +31,26 @@ const getDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const filters = pick(req.query, ["isBooked"]);
+  const result = await doctorScheduleService.getAllDoctorSchedule(
+    options,
+    filters
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "All Doctor Schedule retrieve successfully",
+    data: {
+      meta: result.meta,
+      data: result.data,
+    },
+  });
+});
+
 export const doctorScheduleController = {
   createDoctorSchedule,
   getDoctorSchedule,
+  getAllDoctorSchedule,
 };

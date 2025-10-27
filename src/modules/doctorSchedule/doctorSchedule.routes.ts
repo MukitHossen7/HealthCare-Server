@@ -20,4 +20,10 @@ doctorScheduleRoutes.get(
   doctorScheduleController.getDoctorSchedule
 );
 
+doctorScheduleRoutes.get(
+  "/all",
+  checkAuth(UserRole.ADMIN),
+  doctorScheduleController.getAllDoctorSchedule
+);
+
 export default doctorScheduleRoutes;
