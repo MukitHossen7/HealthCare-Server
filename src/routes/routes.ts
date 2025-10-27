@@ -10,6 +10,7 @@ import adminRoutes from "../modules/admin/admin.routes";
 import appointmentRoutes from "../modules/appointment/appointment.routes";
 import prescriptionRoutes from "../modules/prescription/prescription.routes";
 import reviewRoutes from "../modules/review/review.routes";
+import metaRoutes from "../modules/meta/meta.routes";
 
 const routes = Router();
 
@@ -24,5 +25,6 @@ routes.use("/admins", adminRoutes);
 routes.use("/appointments", appointmentRoutes);
 routes.use("/prescriptions", prescriptionRoutes);
 routes.use("/reviews", reviewRoutes);
+routes.use("/metadata", metaRoutes);
 
 export default routes;
