@@ -1,3 +1,4 @@
+import cron from "node-cron";
 import cors from "cors";
 import express, { Request, Response } from "express";
 import cookieParser from "cookie-parser";
@@ -6,6 +7,7 @@ import globalErrorHandler from "./middlewares/globalErrorHandler";
 import notFound from "./middlewares/notFound";
 import routes from "./routes/routes";
 import { paymentController } from "./modules/payment/payment.controller";
+import { appointmentServices } from "./modules/appointment/appointment.service";
 
 const app = express();
 //parser
@@ -25,6 +27,15 @@ app.use(
     credentials: true,
   })
 );
+
+cron.schedule("* * * * *", () => {
+  console.log("cron is running...");
+  try {
+    appointmentServices.cancelUnpaidAppointment();
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 // routes
 app.use("/api/v1", routes);
