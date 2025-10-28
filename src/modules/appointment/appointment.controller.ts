@@ -20,7 +20,12 @@ const createAppointment = catchAsync(
 
 const getAllAppointments = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-  const filters = pick(req.query, ["status", "paymentStatus"]);
+  const filters = pick(req.query, [
+    "patientEmail",
+    "doctorEmail",
+    "status",
+    "paymentStatus",
+  ]);
 
   const result = await appointmentServices.getAllAppointments(options, filters);
   sendResponse(res, {

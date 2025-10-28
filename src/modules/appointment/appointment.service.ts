@@ -108,9 +108,23 @@ const createAppointment = async (
 
 const getAllAppointments = async (options: TOptions, filters: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
-  const { ...filterData } = filters;
+  const { patientEmail, doctorEmail, ...filterData } = filters;
 
   const andConditions: Prisma.AppointmentWhereInput[] = [];
+
+  if (patientEmail) {
+    andConditions.push({
+      patient: {
+        email: patientEmail,
+      },
+    });
+  } else if (doctorEmail) {
+    andConditions.push({
+      doctor: {
+        email: doctorEmail,
+      },
+    });
+  }
 
   if (Object.keys(filterData).length > 0) {
     andConditions.push({
