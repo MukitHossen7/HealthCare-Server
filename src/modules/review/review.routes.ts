@@ -11,4 +11,5 @@ reviewRoutes.post(
   reviewController.createReview
 );
 
+reviewRoutes.get("/", reviewController.getAllReviews);
 export default reviewRoutes;
