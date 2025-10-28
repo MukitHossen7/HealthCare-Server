@@ -15,13 +15,13 @@ doctorScheduleRoutes.post(
 );
 
 doctorScheduleRoutes.get(
-  "/",
+  "/my-schedule",
   checkAuth(UserRole.DOCTOR),
-  doctorScheduleController.getDoctorSchedule
+  doctorScheduleController.getMyDoctorSchedule
 );
 
 doctorScheduleRoutes.get(
-  "/all",
+  "/",
   checkAuth(UserRole.ADMIN),
   doctorScheduleController.getAllDoctorSchedule
 );

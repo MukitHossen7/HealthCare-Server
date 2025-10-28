@@ -21,15 +21,27 @@ const createDoctorSchedule = catchAsync(
   }
 );
 
-const getDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
-  const result = await doctorScheduleService.getDoctorSchedule();
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Doctor Schedule retrieve successfully",
-    data: result,
-  });
-});
+const getMyDoctorSchedule = catchAsync(
+  async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const user = req.user as IJwtPayload;
+    const filters = pick(req.query, ["startDate", "endDate", "isBooked"]);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+    const result = await doctorScheduleService.getMyDoctorSchedule(
+      user,
+      filters,
+      options
+    );
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Doctor Schedule retrieve successfully",
+      data: {
+        meta: result.meta,
+        data: result.data,
+      },
+    });
+  }
+);
 
 const getAllDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
@@ -51,6 +63,6 @@ const getAllDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
 
 export const doctorScheduleController = {
   createDoctorSchedule,
-  getDoctorSchedule,
+  getMyDoctorSchedule,
   getAllDoctorSchedule,
 };
