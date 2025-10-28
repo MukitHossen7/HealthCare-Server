@@ -33,7 +33,7 @@ const getDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
 
 const getAllDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-  const filters = pick(req.query, ["isBooked"]);
+  const filters = pick(req.query, ["search", "isBooked"]);
   const result = await doctorScheduleService.getAllDoctorSchedule(
     options,
     filters

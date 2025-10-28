@@ -27,17 +27,31 @@ const getDoctorSchedule = async () => {
 
 const getAllDoctorSchedule = async (options: TOptions, filters: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
-  const { ...filterData } = filters;
-  console.log(filterData);
-
+  const { search, ...filterData } = filters;
   const andConditions: Prisma.DoctorSchedulesWhereInput[] = [];
+
+  if (search) {
+    andConditions.push({
+      doctor: {
+        name: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+    });
+  }
+
   if (Object.keys(filterData).length > 0) {
     andConditions.push({
-      AND: Object.entries(filterData).map(([field, value]) => ({
-        [field]: {
-          equals: value,
-        },
-      })),
+      AND: Object.entries(filterData).map(([field, value]) => {
+        if (value === "true") value = true;
+        else if (value === "false") value = false;
+        return {
+          [field]: {
+            equals: value,
+          },
+        };
+      }),
     });
   }
 
@@ -50,6 +64,10 @@ const getAllDoctorSchedule = async (options: TOptions, filters: any) => {
     take: limit,
     orderBy: {
       [sortBy]: sortOrder,
+    },
+    include: {
+      doctor: true,
+      schedule: true,
     },
   });
   const totalData = await prisma.doctorSchedules.count({
