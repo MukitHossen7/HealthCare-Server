@@ -4,6 +4,7 @@ import { doctorScheduleService } from "./doctorSchedule.service";
 import sendResponse from "../../utils/sendResponse";
 import { IJwtPayload } from "../../types/common";
 import { pick } from "../../utils/pick";
+import httpStatus from "http-status";
 
 const createDoctorSchedule = catchAsync(
   async (req: Request & { user?: IJwtPayload }, res: Response) => {
@@ -34,7 +35,7 @@ const getMyDoctorSchedule = catchAsync(
     sendResponse(res, {
       statusCode: 200,
       success: true,
-      message: "Doctor Schedule retrieve successfully",
+      message: "Doctor Own Schedule retrieve successfully",
       data: {
         meta: result.meta,
         data: result.data,
@@ -61,8 +62,27 @@ const getAllDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteDoctorScheduleById = catchAsync(
+  async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const user = req.user as IJwtPayload;
+    const { id } = req.params;
+    const result = await doctorScheduleService.deleteDoctorScheduleById(
+      user,
+      id
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My Schedule deleted successfully!",
+      data: result,
+    });
+  }
+);
+
 export const doctorScheduleController = {
   createDoctorSchedule,
   getMyDoctorSchedule,
   getAllDoctorSchedule,
+  deleteDoctorScheduleById,
 };

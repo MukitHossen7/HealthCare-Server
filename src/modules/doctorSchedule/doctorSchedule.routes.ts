@@ -15,15 +15,20 @@ doctorScheduleRoutes.post(
 );
 
 doctorScheduleRoutes.get(
-  "/my-schedule",
-  checkAuth(UserRole.DOCTOR),
-  doctorScheduleController.getMyDoctorSchedule
-);
-
-doctorScheduleRoutes.get(
   "/",
   checkAuth(UserRole.ADMIN),
   doctorScheduleController.getAllDoctorSchedule
 );
 
+doctorScheduleRoutes.get(
+  "/my-schedule",
+  checkAuth(UserRole.DOCTOR),
+  doctorScheduleController.getMyDoctorSchedule
+);
+
+doctorScheduleRoutes.delete(
+  "/:id",
+  checkAuth(UserRole.DOCTOR),
+  doctorScheduleController.deleteDoctorScheduleById
+);
 export default doctorScheduleRoutes;
