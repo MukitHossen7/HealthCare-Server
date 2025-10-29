@@ -1,4 +1,4 @@
-import { UserRole, UserStatus } from "@prisma/client";
+import { Admin, Doctor, Patient, UserRole, UserStatus } from "@prisma/client";
 import config from "../../config";
 import { IJwtPayload } from "../../types/common";
 import { fileUploader } from "../../utils/fileUploader";
@@ -8,6 +8,7 @@ import {
   ICreateAdminInput,
   ICreateDoctorInput,
   ICreatePatientInput,
+  IUpdateProfile,
 } from "./user.interface";
 import bcrypt from "bcryptjs";
 
@@ -232,6 +233,64 @@ const changeProfileStatus = async (
   });
   return updateStatus;
 };
+
+const updateMyProfile = async (
+  user: IJwtPayload,
+  payload: IUpdateProfile,
+  file?: Express.Multer.File
+) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  let imageUrl;
+  if (file) {
+    const upload = await fileUploader.uploadToCloudinary(file);
+    imageUrl = upload?.secure_url;
+  }
+
+  let profileInfo;
+
+  if (userInfo.role === UserRole.ADMIN) {
+    profileInfo = await prisma.admin.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: {
+        ...payload,
+        ...(imageUrl && { profilePhoto: imageUrl }),
+      },
+    });
+  } else if (userInfo.role === UserRole.PATIENT) {
+    profileInfo = await prisma.patient.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: {
+        ...payload,
+        ...(imageUrl && { profilePhoto: imageUrl }),
+      },
+    });
+  } else if (userInfo.role === UserRole.DOCTOR) {
+    profileInfo = await prisma.doctor.update({
+      where: {
+        email: userInfo.email,
+      },
+      data: {
+        ...payload,
+        ...(imageUrl && { profilePhoto: imageUrl }),
+      },
+    });
+  }
+
+  return {
+    ...profileInfo,
+  };
+};
+
 export const userServices = {
   getMyProfile,
   createPatient,
@@ -239,4 +298,5 @@ export const userServices = {
   createAdmin,
   getAllUsers,
   changeProfileStatus,
+  updateMyProfile,
 };

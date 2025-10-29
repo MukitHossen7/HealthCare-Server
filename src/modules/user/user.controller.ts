@@ -89,6 +89,21 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateMyProfile = catchAsync(
+  async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const user = req.user as IJwtPayload;
+    const file = req.file;
+    const payload = req.body;
+    const result = await userServices.updateMyProfile(user, payload, file);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "My profile updated!",
+      data: result,
+    });
+  }
+);
+
 export const userController = {
   getAllUsers,
   getMyProfile,
@@ -96,4 +111,5 @@ export const userController = {
   createDoctor,
   createAdmin,
   changeProfileStatus,
+  updateMyProfile,
 };

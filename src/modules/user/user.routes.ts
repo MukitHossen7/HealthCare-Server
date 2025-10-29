@@ -45,4 +45,12 @@ userRoute.patch(
   userController.changeProfileStatus
 );
 
+userRoute.patch(
+  "/update-my-profile",
+  checkAuth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  fileUploader.upload.single("file"),
+  zodValidateRequest(userZodValidation.updateProfileZodSchema),
+  userController.updateMyProfile
+);
+
 export default userRoute;

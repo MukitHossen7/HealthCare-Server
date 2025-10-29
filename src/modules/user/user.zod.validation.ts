@@ -75,8 +75,23 @@ const createAdminZodSchema = z.object({
   }),
 });
 
+const updateProfileZodSchema = z.object({
+  name: z.string().optional(),
+  contactNumber: z.string().optional(),
+  address: z.string().optional(),
+  gender: z.enum(["MALE", "FEMALE"]).optional(),
+  profilePhoto: z.string().optional(),
+  registrationNumber: z.string().optional(),
+  experience: z.number().int().nonnegative().optional(),
+  appointmentFee: z.number().int().nonnegative().optional(),
+  qualification: z.string().optional(),
+  currentWorkingPlace: z.string().optional(),
+  designation: z.string().optional(),
+});
+
 export const userZodValidation = {
   createPatientZodSchema,
   createDoctorZodSchema,
   createAdminZodSchema,
+  updateProfileZodSchema,
 };
