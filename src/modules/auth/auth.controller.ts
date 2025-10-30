@@ -24,11 +24,14 @@ const createLogin = catchAsync(async (req: Request, res: Response) => {
     refreshToken: result.refreshToken,
   };
   setAuthCookie(res, userTokens);
+  const { needPasswordChange } = result;
   sendResponse(res, {
     statusCode: 201,
     success: true,
     message: "Your login is successfully",
-    data: result,
+    data: {
+      needPasswordChange,
+    },
   });
 });
 

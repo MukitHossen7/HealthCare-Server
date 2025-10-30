@@ -1,4 +1,4 @@
-import { UserStatus } from "@prisma/client";
+import { UserRole, UserStatus } from "@prisma/client";
 import { prisma } from "../../utils/prisma";
 import { IAuth } from "./auth.interface";
 import AppError from "../../errorHelpers/AppError";
@@ -25,9 +25,43 @@ const getMe = async (userSession: any) => {
       email: decodedData.email,
       status: UserStatus.ACTIVE,
     },
+    include: {
+      doctor: {
+        select: {
+          name: true,
+          profilePhoto: true,
+        },
+      },
+      patient: {
+        select: {
+          name: true,
+          profilePhoto: true,
+        },
+      },
+      admin: {
+        select: {
+          name: true,
+          profilePhoto: true,
+        },
+      },
+    },
   });
 
   const { id, email, role, needPasswordChange, status } = userData;
+
+  let name = null;
+  let profilePhoto = null;
+
+  if (role === UserRole.DOCTOR) {
+    name = userData.doctor?.name;
+    profilePhoto = userData.doctor?.profilePhoto;
+  } else if (role === UserRole.PATIENT) {
+    name = userData.patient?.name;
+    profilePhoto = userData.patient?.profilePhoto;
+  } else if (role === UserRole.ADMIN) {
+    name = userData.admin?.name;
+    profilePhoto = userData.admin?.profilePhoto;
+  }
 
   return {
     id,
@@ -35,6 +69,8 @@ const getMe = async (userSession: any) => {
     role,
     needPasswordChange,
     status,
+    name,
+    profilePhoto,
   };
 };
 
