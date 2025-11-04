@@ -6,8 +6,7 @@ const authRoute = express.Router();
 authRoute.get("/me", authController.getMe);
 
 authRoute.post("/login", authController.createLogin);
-
-//Home work create refresh-token
+authRoute.post("/refresh-token", authController.createNewAccessToken);
 
 //Home work create change password
 

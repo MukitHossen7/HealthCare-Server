@@ -3,7 +3,10 @@ import { prisma } from "../../utils/prisma";
 import { IAuth } from "./auth.interface";
 import AppError from "../../errorHelpers/AppError";
 import bcrypt from "bcryptjs";
-import { createUserTokens } from "../../utils/userToken";
+import {
+  createNewAccessTokenUseRefreshToken,
+  createUserTokens,
+} from "../../utils/userToken";
 import httpStatus from "http-status";
 import { verifyToken } from "../../utils/jwt";
 import config from "../../config";
@@ -117,7 +120,17 @@ const createLogin = async (payload: IAuth) => {
   };
 };
 
+const createNewAccessToken = async (refreshToken: string) => {
+  const newAccessToken = await createNewAccessTokenUseRefreshToken(
+    refreshToken
+  );
+  return {
+    accessToken: newAccessToken.accessToken,
+  };
+};
+
 export const authServices = {
   getMe,
   createLogin,
+  createNewAccessToken,
 };

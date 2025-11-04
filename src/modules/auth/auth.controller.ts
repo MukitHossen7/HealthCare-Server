@@ -3,6 +3,8 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { authServices } from "./auth.service";
 import { setAuthCookie } from "../../utils/setCookie";
+import AppError from "../../errorHelpers/AppError";
+import httpStatus from "http-status";
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
   const userSession = req.cookies;
@@ -35,7 +37,30 @@ const createLogin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createNewAccessToken = catchAsync(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken;
+  console.log(refreshToken);
+
+  if (!refreshToken) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Refresh token is missing");
+  }
+
+  const tokenInfo = await authServices.createNewAccessToken(
+    refreshToken as string
+  );
+
+  setAuthCookie(res, tokenInfo);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "New Access Token Retrieved Successfully",
+    data: tokenInfo.accessToken,
+  });
+});
+
 export const authController = {
   getMe,
   createLogin,
+  createNewAccessToken,
 };
