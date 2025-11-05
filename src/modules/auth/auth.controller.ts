@@ -39,7 +39,7 @@ const createLogin = catchAsync(async (req: Request, res: Response) => {
 
 const createNewAccessToken = catchAsync(async (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken;
-  console.log(refreshToken);
+  // console.log(refreshToken);
 
   if (!refreshToken) {
     throw new AppError(httpStatus.UNAUTHORIZED, "Refresh token is missing");
