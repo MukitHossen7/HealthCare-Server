@@ -1,4 +1,4 @@
-import { Admin, Doctor, Patient, UserRole, UserStatus } from "@prisma/client";
+import { UserRole, UserStatus } from "@prisma/client";
 import config from "../../config";
 import { IJwtPayload } from "../../types/common";
 import { fileUploader } from "../../utils/fileUploader";
@@ -118,7 +118,7 @@ const createPatient = async (
       data: {
         name: payload.patient.name,
         email: payload.patient.email,
-        contactNumber: payload.patient.contactNumber,
+        address: payload.patient.address,
         gender: payload.patient.gender,
         profilePhoto: payload.patient.profilePhoto,
       },

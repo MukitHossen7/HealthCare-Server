@@ -3,7 +3,7 @@ export interface ICreatePatientInput {
   patient: {
     email: string;
     name: string;
-    contactNumber: string;
+    address: string;
     gender: "MALE" | "FEMALE";
     profilePhoto?: string;
   };

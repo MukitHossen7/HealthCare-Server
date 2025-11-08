@@ -9,9 +9,11 @@ const createPatientZodSchema = z.object({
       error: "Name is required",
     }),
     email: z.email(),
-    contactNumber: z.string({
-      error: "Contact number is required",
-    }),
+    contactNumber: z
+      .string({
+        error: "Contact number is required",
+      })
+      .optional(),
     address: z.string().optional(),
     gender: z.enum(["MALE", "FEMALE"]),
     profilePhoto: z.string().optional(),
