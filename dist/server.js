@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
 const config_1 = __importDefault(require("./config"));
+const seedAdmin_1 = require("./utils/seedAdmin");
 let server;
 const healthCareServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -28,7 +29,10 @@ const healthCareServer = () => __awaiter(void 0, void 0, void 0, function* () {
         process.exit(1);
     }
 });
-healthCareServer();
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield healthCareServer();
+    yield (0, seedAdmin_1.seedAdmin)();
+}))();
 //Server error handle
 process.on("unhandledRejection", (err) => {
     console.log("unHandle rejection detected... Server shutting down... ", err);
