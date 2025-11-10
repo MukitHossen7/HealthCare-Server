@@ -1,9 +1,6 @@
 # HealthCare Management System
 
-- HealthCare Management System ** is a comprehensive healthcare management platform designed to streamline the interaction between patients, doctors, and administrators.  
-  The platform allows seamless **appointment booking**, **schedule management**, **specialty tracking**, **prescription handling**, and **real-time analytics** for hospital staff.  
-  With **role-based access** and **secure authentication**, it ensures smooth and safe management of healthcare operations.  
-  Additionally, it includes **AI-based doctor suggestions\*\* to help patients connect with the most suitable doctors for their needs.
+- HealthCare Management System ** is a comprehensive healthcare management platform designed to streamline the interaction between patients, doctors, and administrators.The platform allows seamless **appointment booking**, **schedule management**, **specialty tracking**, **prescription handling**, and **real-time analytics** for hospital staff.With **role-based access** and **secure authentication**, it ensures smooth and safe management of healthcare operations.Additionally, it includes **AI-based doctor suggestions\*\* to help patients connect with the most suitable doctors for their needs.
 
 ---
 
