@@ -1,6 +1,7 @@
 import { Server } from "http";
 import app from "./app";
 import config from "./config";
+import { seedAdmin } from "./utils/seedAdmin";
 
 let server: Server;
 
@@ -17,7 +18,10 @@ const healthCareServer = async () => {
   }
 };
 
-healthCareServer();
+(async () => {
+  await healthCareServer();
+  await seedAdmin();
+})();
 
 //Server error handle
 process.on("unhandledRejection", (err) => {

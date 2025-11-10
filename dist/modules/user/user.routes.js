@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const user_controller_1 = require("./user.controller");
+const fileUploader_1 = require("../../utils/fileUploader");
+const zodValidateRequest_1 = require("../../middlewares/zodValidateRequest");
+const user_zod_validation_1 = require("./user.zod.validation");
+const checkAuth_1 = require("../../middlewares/checkAuth");
+const client_1 = require("@prisma/client");
+const userRoute = express_1.default.Router();
+userRoute.get("/", (0, checkAuth_1.checkAuth)(client_1.UserRole.ADMIN), user_controller_1.userController.getAllUsers);
+userRoute.get("/my-profile", (0, checkAuth_1.checkAuth)(client_1.UserRole.ADMIN, client_1.UserRole.DOCTOR, client_1.UserRole.PATIENT), user_controller_1.userController.getMyProfile);
+userRoute.post("/create-patient", fileUploader_1.fileUploader.upload.single("file"), (0, zodValidateRequest_1.zodValidateRequest)(user_zod_validation_1.userZodValidation.createPatientZodSchema), user_controller_1.userController.createPatient);
+userRoute.post("/create-doctor", (0, checkAuth_1.checkAuth)(client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), (0, zodValidateRequest_1.zodValidateRequest)(user_zod_validation_1.userZodValidation.createDoctorZodSchema), user_controller_1.userController.createDoctor);
+userRoute.post("/create-admin", (0, checkAuth_1.checkAuth)(client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), (0, zodValidateRequest_1.zodValidateRequest)(user_zod_validation_1.userZodValidation.createAdminZodSchema), user_controller_1.userController.createAdmin);
+userRoute.patch("/:id/status", (0, checkAuth_1.checkAuth)(client_1.UserRole.ADMIN), user_controller_1.userController.changeProfileStatus);
+userRoute.patch("/update-my-profile", (0, checkAuth_1.checkAuth)(client_1.UserRole.ADMIN, client_1.UserRole.DOCTOR, client_1.UserRole.PATIENT), fileUploader_1.fileUploader.upload.single("file"), (0, zodValidateRequest_1.zodValidateRequest)(user_zod_validation_1.userZodValidation.updateProfileZodSchema), user_controller_1.userController.updateMyProfile);
+exports.default = userRoute;
