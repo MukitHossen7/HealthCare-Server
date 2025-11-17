@@ -2,13 +2,14 @@ import { Server } from "http";
 import app from "./app";
 import config from "./config";
 import { seedAdmin } from "./utils/seedAdmin";
+import { prisma } from "./config/db";
 
 let server: Server;
 
 const healthCareServer = async () => {
   try {
-    // await prisma.$connect();
-    // console.log("✅ Connected to the database successfully.");
+    await prisma.$connect();
+    console.log("✅ Connected to the database successfully.");
     server = app.listen(config.PORT, () => {
       console.log(`🚀 Server is running on http://localhost: ${config.PORT}`);
     });
