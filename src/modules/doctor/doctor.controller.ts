@@ -7,12 +7,12 @@ import { pick } from "../../utils/pick";
 const getAllDoctors = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
   const filters = pick(req.query, [
-    "search",
+    "searchTerm",
     "contactNumber",
     "experience",
     "gender",
     "appointmentFee",
-    "specialties",
+    "speciality",
   ]);
   const result = await doctorServices.getAllDoctors(options, filters);
   sendResponse(res, {

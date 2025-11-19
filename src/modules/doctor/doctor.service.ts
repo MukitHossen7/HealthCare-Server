@@ -9,15 +9,15 @@ import { openai } from "../../utils/openRouter";
 const getAllDoctors = async (options: TOptions, filters: any) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
   const searchFields = ["name", "email"];
-  const { search, specialties, ...filterFields } = filters;
+  const { searchTerm, speciality, ...filterFields } = filters;
 
   const andConditions: Prisma.DoctorWhereInput[] = [];
 
-  if (search) {
+  if (searchTerm) {
     const searchResult = {
       OR: searchFields.map((field) => ({
         [field]: {
-          contains: search,
+          contains: searchTerm,
           mode: "insensitive",
         },
       })),
@@ -25,13 +25,13 @@ const getAllDoctors = async (options: TOptions, filters: any) => {
     andConditions.push(searchResult);
   }
 
-  if (specialties && specialties.length > 0) {
+  if (speciality && speciality.length > 0) {
     andConditions.push({
       doctorSpecialties: {
         some: {
           specialties: {
             title: {
-              contains: specialties,
+              contains: speciality,
               mode: "insensitive",
             },
           },
