@@ -10,19 +10,6 @@
 https://health-care-server-nine.vercel.app/
 ```
 
-## Admin And Doctor Email, Password
-
-```
-Admin:
-  email: admin@gmail.com,
-  password: Admin123@
-
-Doctor:
- email: shampa.roy@example.com
- password: doctor@123
-
-```
-
 ## Features
 
 - Role-based user authentication (Admin, Doctor, Patient)
